@@ -1,0 +1,15 @@
+TOTAL SALES COST REPORT
+------------------------------
+Total Cost: $2,481.86
+Execution Time: 0.0004 seconds
+
+TOTAL SALES COST REPORT
+------------------------------
+Total Cost: $166,568.23
+Execution Time: 0.0012 seconds
+
+TOTAL SALES COST REPORT
+------------------------------
+Total Cost: $165,235.37
+Execution Time: 0.0011 seconds
+

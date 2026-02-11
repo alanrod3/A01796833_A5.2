@@ -85,7 +85,7 @@ def print_and_save_results(total_cost, elapsed_time):
         f"Total Cost: ${total_cost:,.2f}",
         f"Execution Time: {elapsed_time:.4f} seconds"
     ]
-    output_string = "\n".join(output_lines)
+    output_string = "\n".join(output_lines) + "\n\n"
 
     # Print to Console
     print("\n" + output_string)
@@ -103,7 +103,7 @@ def print_and_save_results(total_cost, elapsed_time):
     output_path = os.path.join(results_dir, "SalesResults.txt")
 
     try:
-        with open(output_path, "w", encoding='utf-8') as result_file:
+        with open(output_path, "a", encoding='utf-8') as result_file:
             result_file.write(output_string)
         print(f"\nResults saved to: {output_path}")
     # pylint: disable=broad-exception-caught
