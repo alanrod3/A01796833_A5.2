@@ -1,3 +1,8 @@
+# pylint: disable=invalid-name
+"""
+Script to compute total sales from a price catalogue and sales record.
+This script handles file loading, error management, and output formatting.
+"""
 import json
 import sys
 import time
@@ -7,6 +12,7 @@ import os
 def load_json_file(filename):
     """
     Loads a JSON file and handles invalid file errors.
+    Returns the data or None if an error occurs.
     """
     try:
         with open(filename, 'r', encoding='utf-8') as file:
@@ -17,14 +23,17 @@ def load_json_file(filename):
     except json.JSONDecodeError:
         print(f"Error: The file '{filename}' contains invalid JSON format.")
         return None
-    except Exception as e:
-        print(f"An unexpected error occurred while reading '{filename}': {e}")
+    # pylint: disable=broad-exception-caught
+    except Exception as error:
+        print(f"An unexpected error occurred while reading '{filename}': "
+              f"{error}")
         return None
 
 
 def create_price_map(price_list):
     """
     Converts the price list into a dictionary for O(1) access time.
+    Handles variable key names for product and price.
     """
     price_map = {}
     for item in price_list:
@@ -38,7 +47,8 @@ def create_price_map(price_list):
 
 def compute_total_cost(price_map, sales_list):
     """
-    Computes total sales cost.
+    Computes total sales cost based on the price map.
+    Prints errors for invalid items but continues execution.
     """
     total_cost = 0.0
 
@@ -64,6 +74,43 @@ def compute_total_cost(price_map, sales_list):
     return total_cost
 
 
+def print_and_save_results(total_cost, elapsed_time):
+    """
+    Formats the results, prints them to console, and saves to a file.
+    Handles the path logic to save in the 'results' directory.
+    """
+    output_lines = [
+        "TOTAL SALES COST REPORT",
+        "-" * 30,
+        f"Total Cost: ${total_cost:,.2f}",
+        f"Execution Time: {elapsed_time:.4f} seconds"
+    ]
+    output_string = "\n".join(output_lines)
+
+    # Print to Console
+    print("\n" + output_string)
+
+    # Path Handling
+    current_script_dir = os.path.dirname(os.path.abspath(__file__))
+    results_dir = os.path.join(current_script_dir, '..', 'results')
+
+    if not os.path.exists(results_dir):
+        try:
+            os.makedirs(results_dir)
+        except OSError:
+            results_dir = os.getcwd()
+
+    output_path = os.path.join(results_dir, "SalesResults.txt")
+
+    try:
+        with open(output_path, "w", encoding='utf-8') as result_file:
+            result_file.write(output_string)
+        print(f"\nResults saved to: {output_path}")
+    # pylint: disable=broad-exception-caught
+    except Exception as error:
+        print(f"Error writing to results file: {error}")
+
+
 def main():
     """
     Main function to execute the program logic.
@@ -71,7 +118,8 @@ def main():
     start_time = time.time()
 
     if len(sys.argv) != 3:
-        print("Usage: python computeSales.py priceCatalogue.json salesRecord.json")
+        print("Usage: python computeSales.py priceCatalogue.json "
+              "salesRecord.json")
         sys.exit(1)
 
     price_file = sys.argv[1]
@@ -89,41 +137,7 @@ def main():
     end_time = time.time()
     elapsed_time = end_time - start_time
 
-    # Output formatting
-    output_lines = [
-        "TOTAL SALES COST REPORT",
-        "-" * 30,
-        f"Total Cost: ${total_cost:,.2f}",
-        f"Execution Time: {elapsed_time:.4f} seconds"
-    ]
-    output_string = "\n".join(output_lines)
-
-    # Print to Console
-    print("\n" + output_string)
-
-    # --- PATH HANDLING FOR OUTPUT ---
-    # This logic finds the 'results' folder automatically
-    # It assumes 'results' is at the same level as the 'source' folder
-    current_script_dir = os.path.dirname(os.path.abspath(__file__))
-    results_dir = os.path.join(current_script_dir, '..', 'results')
-
-    # If results folder doesn't exist (e.g. folder structure changed),
-    # fallback to current working directory
-    if not os.path.exists(results_dir):
-        try:
-            os.makedirs(results_dir)
-        except OSError:
-            results_dir = os.getcwd()
-
-    output_path = os.path.join(results_dir, "SalesResults.txt")
-
-    # Write to File
-    try:
-        with open(output_path, "w", encoding='utf-8') as result_file:
-            result_file.write(output_string)
-        print(f"\nResults saved to: {output_path}")
-    except Exception as e:
-        print(f"Error writing to results file: {e}")
+    print_and_save_results(total_cost, elapsed_time)
 
 
 if __name__ == "__main__":
